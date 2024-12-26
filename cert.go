@@ -47,7 +47,7 @@ func init() {
 	}
 }
 
-func (m *mkcert) makeCert(hosts []string) {
+func (m *mkcert) makeCert(hosts []string, days int) {
 	if m.caKey == nil {
 		log.Fatalln("ERROR: can't create new certificates because the CA key (rootCA-key.pem) is missing")
 	}
@@ -59,7 +59,7 @@ func (m *mkcert) makeCert(hosts []string) {
 	// Certificates last for 2 years and 3 months, which is always less than
 	// 825 days, the limit that macOS/iOS apply to all certificates,
 	// including custom roots. See https://support.apple.com/en-us/HT210176.
-	expiration := time.Now().AddDate(2, 3, 0)
+	expiration := time.Now().AddDate(0, 0, days)
 
 	tpl := &x509.Certificate{
 		SerialNumber: randomSerialNumber(),

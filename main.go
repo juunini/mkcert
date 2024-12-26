@@ -54,6 +54,9 @@ const advancedUsage = `Advanced options:
 	-client
 	    Generate a certificate for client authentication.
 
+	-days DAYS
+	    Set the duration that the certificate is valid for. (default: 820 days)
+
 	-ecdsa
 	    Generate a certificate with an ECDSA key.
 
@@ -102,6 +105,7 @@ func main() {
 		certFileFlag  = flag.String("cert-file", "", "")
 		keyFileFlag   = flag.String("key-file", "", "")
 		p12FileFlag   = flag.String("p12-file", "", "")
+		daysFlag      = flag.Int("days", 820, "")
 		versionFlag   = flag.Bool("version", false, "")
 	)
 	flag.Usage = func() {
@@ -146,7 +150,7 @@ func main() {
 		installMode: *installFlag, uninstallMode: *uninstallFlag, csrPath: *csrFlag,
 		pkcs12: *pkcs12Flag, ecdsa: *ecdsaFlag, client: *clientFlag,
 		certFile: *certFileFlag, keyFile: *keyFileFlag, p12File: *p12FileFlag,
-	}).Run(flag.Args())
+	}).Run(flag.Args(), *daysFlag)
 }
 
 const rootName = "rootCA.pem"
@@ -168,7 +172,7 @@ type mkcert struct {
 	ignoreCheckFailure bool
 }
 
-func (m *mkcert) Run(args []string) {
+func (m *mkcert) Run(args []string, days int) {
 	m.CAROOT = getCAROOT()
 	if m.CAROOT == "" {
 		log.Fatalln("ERROR: failed to find the default CA location, set one as the CAROOT env var")
@@ -234,7 +238,7 @@ func (m *mkcert) Run(args []string) {
 		}
 	}
 
-	m.makeCert(args)
+	m.makeCert(args, days)
 }
 
 func getCAROOT() string {
